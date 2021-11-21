@@ -1,4 +1,5 @@
-use std::env;
+use itertools::Itertools;
+use std::{env, fmt::format};
 
 use rand::{prelude::IteratorRandom, thread_rng};
 
@@ -10,22 +11,36 @@ struct Lotto {
 
 impl Lotto {
     fn new(take: usize, from: usize) -> Self {
-        todo!("Implement")
+        let mut rng = thread_rng();
+        Lotto {
+            take,
+            from,
+            numbers: (1..from).choose_multiple(&mut rng, take),
+        }
     }
 
     fn get_numbers(self) -> Vec<usize> {
-        todo!("Implement")
+        self.numbers
     }
 }
 
 fn format_lotto_results(lotto: &Lotto) -> String {
-    // Tip: Use the format macro
-    todo!("Implement")
+    format!(
+        "{} of {}: [{}]",
+        lotto.take,
+        lotto.from,
+        lotto.numbers.iter().format(", ")
+    )
 }
 
 fn main() {
     let args: Vec<String> = env::args().collect();
-    todo!("Implement CLI")
+    if args.len() == 3 {
+        let take: usize = args[1].parse().expect("Could not parse take");
+        let from: usize = args[2].parse().expect("Could not parse from");
+        let lotto = Lotto::new(take, from);
+        println!("{}", format_lotto_results(&lotto))
+    }
 }
 
 #[test]
