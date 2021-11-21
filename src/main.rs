@@ -1,5 +1,5 @@
 use itertools::Itertools;
-use std::{env, fmt::format};
+use std::env;
 
 use rand::{prelude::IteratorRandom, thread_rng};
 
@@ -15,12 +15,12 @@ impl Lotto {
         Lotto {
             take,
             from,
-            numbers: (1..from).choose_multiple(&mut rng, take),
+            numbers: (1..=from).choose_multiple(&mut rng, take),
         }
     }
 
-    fn get_numbers(self) -> Vec<usize> {
-        self.numbers
+    fn get_numbers(&self) -> Vec<usize> {
+        self.numbers.clone()
     }
 }
 
@@ -29,15 +29,19 @@ fn format_lotto_results(lotto: &Lotto) -> String {
         "{} of {}: [{}]",
         lotto.take,
         lotto.from,
-        lotto.numbers.iter().format(", ")
+        lotto.get_numbers().iter().format(", ")
     )
 }
 
 fn main() {
     let args: Vec<String> = env::args().collect();
-    if args.len() == 3 {
-        let take: usize = args[1].parse().expect("Could not parse take");
-        let from: usize = args[2].parse().expect("Could not parse from");
+    if args.len() < 3 || (args.len() % 2) != 1 {
+        println!("Invalid number of arguments");
+        return;
+    }
+    for i in 0..args.len() / 2 {
+        let take: usize = args[2 * i + 1].parse().expect("Could not parse take");
+        let from: usize = args[2 * i + 2].parse().expect("Could not parse from");
         let lotto = Lotto::new(take, from);
         println!("{}", format_lotto_results(&lotto))
     }
